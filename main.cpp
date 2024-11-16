@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include "font_data.cpp"  // font_data.cpp 파일 포함
+#include "font_data.cpp"  // font_data.cpp 파일
+#include "description.h"
 
 // 폰트 데이터 써서 sf::Font 객체로 변환하는 함수 (메모리에 직접 불러옴)
 sf::Font loadFontFromData() {
