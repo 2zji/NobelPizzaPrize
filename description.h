@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 
-// 함수 선언
-void drawDescriptionScreen(sf::RenderWindow& window, sf::Font& font);
+//함수 선언
+void drawDescriptionScreen(sf::RenderWindow& window, sf::Font& font, sf::RectangleShape& startButton, sf::Text& startButtonText);
 
 #endif // DESCRIPTION_H
