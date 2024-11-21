@@ -4,7 +4,7 @@
 void startGame();
 
 void showDescription() {
-    sf::RenderWindow descriptionWindow(sf::VideoMode(800, 600), L"게임 설명");
+    sf::RenderWindow descriptionWindow(sf::VideoMode(800, 600), L"노벨피자상");
 
     sf::Font font;
     if (!font.loadFromFile("BagelFatOne-Regular.ttf")) {
@@ -20,7 +20,7 @@ void showDescription() {
     description.setFillColor(sf::Color::Black);
     description.setPosition(50, 100);
 
-    // 게임 시작 버튼 (사각형 + 텍스트)
+    // 게임 시작 버튼
     sf::RectangleShape startButtonBox(sf::Vector2f(200, 50));
     startButtonBox.setFillColor(sf::Color(234, 187, 101));
     startButtonBox.setPosition(300, 450);
@@ -51,8 +51,8 @@ void showDescription() {
 
         descriptionWindow.clear(sf::Color(255, 241, 184)); // 배경색
         descriptionWindow.draw(description);
-        descriptionWindow.draw(startButtonBox); // 버튼 박스
-        descriptionWindow.draw(startButtonText); // 버튼 텍스트
+        descriptionWindow.draw(startButtonBox);
+        descriptionWindow.draw(startButtonText);
         descriptionWindow.display();
     }
 }

@@ -10,7 +10,7 @@ int main() {
 
     // 폰트 설정
     sf::Font font;
-    if (!font.loadFromFile("BagelFatOne-Regular.ttf")) { // 폰트 파일 필요
+    if (!font.loadFromFile("BagelFatOne-Regular.ttf")) {
         std::cerr << "폰트를 불러올 수 없습니다!" << std::endl;
         return -1;
     }
@@ -20,7 +20,7 @@ int main() {
     title.setFillColor(sf::Color::Black);
     title.setPosition(240, 100);
 
-    // 시작 버튼 (사각형 + 텍스트)
+    // 시작 버튼
     sf::RectangleShape startButtonBox(sf::Vector2f(200, 50));
     startButtonBox.setFillColor(sf::Color(234, 187, 101));
     startButtonBox.setPosition(300, 200);
@@ -29,7 +29,7 @@ int main() {
     startButtonText.setFillColor(sf::Color::Black);
     startButtonText.setPosition(320, 205);
 
-    // 게임 설명 버튼 (사각형 + 텍스트)
+    // 게임 설명 버튼
     sf::RectangleShape descriptionButtonBox(sf::Vector2f(200, 50));
     descriptionButtonBox.setFillColor(sf::Color(234, 187, 101));
     descriptionButtonBox.setPosition(300, 300);
