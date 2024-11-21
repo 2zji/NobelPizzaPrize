@@ -1,101 +1,75 @@
 #include <SFML/Graphics.hpp>
-#include "description.h"
-#include "common.h" // isButtonClicked 함수 포함
+#include <SFML/Window.hpp>
+#include <iostream>
 
-// 메인 함수
+void startGame(); // game.cpp
+void showDescription(); // description.cpp
+
 int main() {
-    // 창 설정
     sf::RenderWindow window(sf::VideoMode(800, 600), L"노벨피자상");
 
-    // 폰트 로드
-    sf::Font font = loadFontFromData();
+    // 폰트 설정
+    sf::Font font;
+    if (!font.loadFromFile("BagelFatOne-Regular.ttf")) { // 폰트 파일 필요
+        std::cerr << "폰트를 불러올 수 없습니다!" << std::endl;
+        return -1;
+    }
 
-    // 제목 텍스트 설정
-    sf::Text titleText;
-    titleText.setFont(font);
-    titleText.setString(L"노벨피자상");
-    titleText.setCharacterSize(50);
-    titleText.setFillColor(sf::Color::Black);
-    titleText.setPosition(300, 100);
+    // 타이틀 텍스트
+    sf::Text title(L"노벨피자상", font, 50);
+    title.setFillColor(sf::Color::Black);
+    title.setPosition(240, 100);
 
-    // 시작 버튼 설정
-    sf::RectangleShape startButton(sf::Vector2f(200, 50));
-    startButton.setFillColor(sf::Color(234, 187, 101));
-    startButton.setPosition(300, 200);
+    // 시작 버튼 (사각형 + 텍스트)
+    sf::RectangleShape startButtonBox(sf::Vector2f(200, 50));
+    startButtonBox.setFillColor(sf::Color(234, 187, 101));
+    startButtonBox.setPosition(300, 200);
 
-    sf::Text startButtonText;
-    startButtonText.setFont(font);
-    startButtonText.setString(L"게임 시작");
-    startButtonText.setCharacterSize(30);
+    sf::Text startButtonText(L"게임 시작", font, 30);
     startButtonText.setFillColor(sf::Color::Black);
-    centerText(startButtonText, startButton);
+    startButtonText.setPosition(320, 205);
 
-    // 게임 설명 버튼 설정
-    sf::RectangleShape instructionsButton(sf::Vector2f(200, 50));
-    instructionsButton.setFillColor(sf::Color(234, 187, 101));
-    instructionsButton.setPosition(300, 300);
+    // 게임 설명 버튼 (사각형 + 텍스트)
+    sf::RectangleShape descriptionButtonBox(sf::Vector2f(200, 50));
+    descriptionButtonBox.setFillColor(sf::Color(234, 187, 101));
+    descriptionButtonBox.setPosition(300, 300);
 
-    sf::Text instructionsButtonText;
-    instructionsButtonText.setFont(font);
-    instructionsButtonText.setString(L"게임 설명");
-    instructionsButtonText.setCharacterSize(30);
-    instructionsButtonText.setFillColor(sf::Color::Black);
-    centerText(instructionsButtonText, instructionsButton);
+    sf::Text descriptionButtonText(L"게임 설명", font, 30);
+    descriptionButtonText.setFillColor(sf::Color::Black);
+    descriptionButtonText.setPosition(320, 305);
 
-    // 뒤로 가기 버튼 설정 (설명 화면용)
-    Button backButton(
-        sf::Vector2f(200, 50), sf::Vector2f(300, 500), sf::Color(200, 100, 100),
-        L"뒤로 가기", font, 30, sf::Color::White
-    );
-
-    bool showDescription = false;
-
-    // 게임 루프
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::Closed) {
                 window.close();
+            }
 
             if (event.type == sf::Event::MouseButtonPressed) {
-                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
-                if (!showDescription) {
-                    // 시작 버튼 클릭
-                    if (isButtonClicked(startButton, mousePos)) {
-                        titleText.setString(L"게임이 시작됩니다!");
+                    // 시작 버튼 클릭 처리
+                    if (startButtonBox.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                        window.close();
+                        startGame();
                     }
 
-                    // 게임 설명 버튼 클릭
-                    if (isButtonClicked(instructionsButton, mousePos)) {
-                        showDescription = true; // 설명 화면으로 전환
-                    }
-                }
-                else {
-                    // 뒤로 가기 버튼 클릭
-                    if (backButton.isClicked(mousePos)) {
-                        showDescription = false; // 메인 화면으로 돌아가기
+                    // 게임 설명 버튼 클릭 처리
+                    if (descriptionButtonBox.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                        window.close();
+                        showDescription();
                     }
                 }
             }
         }
 
-        // 화면 그리기
-        window.clear(sf::Color(255, 241, 184));
-
-        if (!showDescription) {
-            // 메인 화면
-            window.draw(titleText);
-            window.draw(startButton);
-            window.draw(startButtonText);
-            window.draw(instructionsButton);
-            window.draw(instructionsButtonText);
-        }
-        else {
-            // 설명 화면
-            drawDescriptionScreen(window, font, backButton);
-        }
-
+        window.clear(sf::Color(255, 241, 184)); // 배경색
+        window.draw(title);
+        window.draw(startButtonBox);
+        window.draw(startButtonText);
+        window.draw(descriptionButtonBox);
+        window.draw(descriptionButtonText);
         window.display();
     }
 
