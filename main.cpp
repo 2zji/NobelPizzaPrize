@@ -2,6 +2,7 @@
 #include <SFML/Window.hpp>
 #include <iostream>
 
+
 void startGame(); // game.cpp
 void showDescription(); // description.cpp
 
