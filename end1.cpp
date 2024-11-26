@@ -22,7 +22,7 @@ void showEnd1() {
             }
         }
 
-        window.clear(sf::Color::White);
+        window.clear(sf::Color(255, 241, 184));
         window.draw(text);
         window.display();
     }

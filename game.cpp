@@ -1,164 +1,170 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/System.hpp>
 #include <iostream>
-#include <string>
-#include <vector>
+#include <cstdlib>
+#include <ctime>
 
-// End 화면 이동 함수
-void showEnd1(); // 성공 화면
-void showEnd2(); // 실패 화면
+const int WINDOW_WIDTH = 800;
+const int WINDOW_HEIGHT = 600;
+const int GAME_TIME = 60;
 
-class Pizza {
+// 재료 클래스
+class Ingredient {
 public:
-    enum Ingredient { Dough, Cheese, Pepperoni, Potato, None };
+    sf::Texture texture;
+    sf::Sprite sprite;
+    std::string name;
+    int price;
 
-    Pizza() : currentStep(Dough), isComplete(false), isCorrect(true) {}
-
-    // 재료 추가 메서드
-    void addIngredient(Ingredient ingredient) {
-        if (isComplete) return; // 이미 완성된 경우
-        if (ingredient == None) return; // 유효하지 않은 재료
-
-        // 올바른 순서인지 확인
-        if ((currentStep == Dough && ingredient == Cheese) ||
-            (currentStep == Cheese && (ingredient == Pepperoni || ingredient == Potato))) {
-            currentStep = ingredient;
-            if (currentStep == Pepperoni || currentStep == Potato) {
-                isComplete = true;
-                type = (currentStep == Pepperoni) ? "Pepperoni" : "Potato";
-            }
-        }
-        else {
-            isCorrect = false; // 잘못된 순서
-        }
+    Ingredient(const std::string& textureFile, const std::string& ingredientName, int ingredientPrice) {
+        texture.loadFromFile(textureFile);
+        sprite.setTexture(texture);
+        name = ingredientName;
+        price = ingredientPrice;
     }
 
-    // 점수 계산
-    int getScore() const {
-        if (!isComplete || !isCorrect) return -1000; // 틀리면 감점
-        return (type == "Pepperoni") ? 1500 : 2000; // 올바른 피자의 가격 반환
+    void setPosition(float x, float y) {
+        sprite.setPosition(x, y);
     }
 
-private:
-    Ingredient currentStep; // 현재 재료 단계
-    bool isComplete;        // 피자가 완성되었는지 여부
-    bool isCorrect;         // 올바르게 만들어졌는지 여부
-    std::string type;       // 피자 종류
+    void draw(sf::RenderWindow& window) {
+        window.draw(sprite);
+    }
 };
 
-class Game {
-public:
-    Game() : remainingTime(60), totalScore(0), pizzaCount(0) {
-        clock.restart();
-    }
+// 게임 클래스
+class PizzaGame {
+private:
+    int totalMoney;
+    int elapsedTime;
+    bool gameEnded;
+    sf::Font font;
+    sf::Text moneyText, timerText;
+    sf::Clock clock;
 
-    void run() {
-        sf::RenderWindow gameWindow(sf::VideoMode(800, 600), L"피자 만들기 게임");
+    Ingredient* dough;
+    Ingredient* tomato;
+    Ingredient* cheese;
+    Ingredient* pepperoni;
+    Ingredient* potato;
+
+public:
+    PizzaGame() {
+        totalMoney = 0;
+        elapsedTime = 0;
+        gameEnded = false;
 
         // 폰트 로드
-        sf::Font font;
-        if (!font.loadFromFile("BagelFatOne-Regular.ttf")) {
-            std::cerr << "폰트를 불러올 수 없습니다!" << std::endl;
-            return;
+        if (!font.loadFromFile("Arial.ttf")) {
+            std::cout << "Error loading font" << std::endl;
         }
 
-        // UI 설정
-        sf::Text timerText, scoreText, instructionText;
-        setupText(timerText, font, 30, sf::Color::Black, { 50, 20 });
-        setupText(scoreText, font, 30, sf::Color::Black, { 50, 60 });
-        setupText(instructionText, font, 20, sf::Color::Black, { 50, 500 });
-        instructionText.setString(L"클릭으로 재료를 추가하세요: 1) 도우, 2) 치즈, 3) 페퍼로니, 4) 포테이토");
+        moneyText.setFont(font);
+        moneyText.setCharacterSize(24);
+        moneyText.setFillColor(sf::Color::White);
+        moneyText.setPosition(650, 10);
 
-        while (gameWindow.isOpen()) {
-            handleEvents(gameWindow);
-            update();
-            render(gameWindow, timerText, scoreText, instructionText);
-        }
+        timerText.setFont(font);
+        timerText.setCharacterSize(24);
+        timerText.setFillColor(sf::Color::White);
+        timerText.setPosition(10, 10);
+
+        // 재료 초기화
+        dough = new Ingredient("dou.png", "Dough", 0);
+        tomato = new Ingredient("tomato.png", "Tomato", 0);
+        cheese = new Ingredient("cheese.png", "Cheese", 0);
+        pepperoni = new Ingredient("pepperoni.png", "Pepperoni", 1200);
+        potato = new Ingredient("potato.png", "Potato", 1500);
     }
 
-private:
-    sf::Clock clock;       // 시간 관리
-    int remainingTime;     // 남은 시간
-    int totalScore;        // 총 점수
-    int pizzaCount;        // 완성된 피자 수
-    Pizza currentPizza;    // 현재 피자
+    ~PizzaGame() {
+        delete dough;
+        delete tomato;
+        delete cheese;
+        delete pepperoni;
+        delete potato;
+    }
 
-    void handleEvents(sf::RenderWindow& window) {
+    void updateGame() {
+        if (gameEnded) return;
+
+        elapsedTime = clock.getElapsedTime().asSeconds();
+        int remainingTime = GAME_TIME - elapsedTime;
+
+        if (remainingTime <= 0) {
+            gameEnded = true;
+            if (totalMoney >= 10000) {
+                std::cout << "You win!" << std::endl; // Show end1.cpp screen
+            }
+            else {
+                std::cout << "You lose!" << std::endl; // Show end2.cpp screen
+            }
+        }
+
+        // 타이머 텍스트 업데이트
+        timerText.setString("Time: " + std::to_string(remainingTime));
+
+        // 돈 텍스트 업데이트
+        moneyText.setString("Money: " + std::to_string(totalMoney));
+    }
+
+    void renderGame(sf::RenderWindow& window) {
+        window.clear();
+
+        // 재료 그리기
+        dough->draw(window);
+        tomato->draw(window);
+        cheese->draw(window);
+        pepperoni->draw(window);
+        potato->draw(window);
+
+        // 텍스트 그리기
+        window.draw(moneyText);
+        window.draw(timerText);
+
+        window.display();
+    }
+
+    void handleInput(sf::RenderWindow& window) {
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
 
-            if (event.type == sf::Event::KeyPressed) {
-                if (event.key.code == sf::Keyboard::Num1) {
-                    currentPizza.addIngredient(Pizza::Dough);
+            if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+                // 재료 버튼 클릭 처리
+                if (pepperoni->sprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                    totalMoney += pepperoni->price; // 페퍼로니 피자 추가
                 }
-                else if (event.key.code == sf::Keyboard::Num2) {
-                    currentPizza.addIngredient(Pizza::Cheese);
-                }
-                else if (event.key.code == sf::Keyboard::Num3) {
-                    currentPizza.addIngredient(Pizza::Pepperoni);
-                    finalizePizza();
-                }
-                else if (event.key.code == sf::Keyboard::Num4) {
-                    currentPizza.addIngredient(Pizza::Potato);
-                    finalizePizza();
+                else if (potato->sprite.getGlobalBounds().contains(mousePos.x, mousePos.y)) {
+                    totalMoney += potato->price; // 포테이토 피자 추가
                 }
             }
         }
     }
 
-    void update() {
-        int elapsedSeconds = static_cast<int>(clock.getElapsedTime().asSeconds());
-        remainingTime = 60 - elapsedSeconds;
-
-        if (remainingTime <= 0) {
-            endGame();
-        }
-    }
-
-    void render(sf::RenderWindow& window, sf::Text& timerText, sf::Text& scoreText, sf::Text& instructionText) {
-        std::wstring timerStr = L"남은 시간: " + std::to_wstring(remainingTime) + L"초";
-        std::wstring scoreStr = L"점수: " + std::to_wstring(totalScore) + L"원, 피자: " + std::to_wstring(pizzaCount) + L"개";
-
-        timerText.setString(timerStr);
-        scoreText.setString(scoreStr);
-
-
-        window.clear(sf::Color::White);
-        window.draw(timerText);
-        window.draw(scoreText);
-        window.draw(instructionText);
-        window.display();
-    }
-
-    void setupText(sf::Text& text, sf::Font& font, int size, sf::Color color, sf::Vector2f position) {
-        text.setFont(font);
-        text.setCharacterSize(size);
-        text.setFillColor(color);
-        text.setPosition(position);
-    }
-
-    void finalizePizza() {
-        totalScore += currentPizza.getScore();
-        if (currentPizza.getScore() > 0) {
-            pizzaCount++;
-        }
-        currentPizza = Pizza(); // 새로운 피자 준비
-    }
-
-    void endGame() {
-        if (totalScore >= 10000) {
-            showEnd1();
-        }
-        else {
-            showEnd2();
-        }
+    int getTotalMoney() const {
+        return totalMoney;
     }
 };
 
 int main() {
-    Game game;
-    game.run();
+    // SFML 윈도우 생성
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Pizza Game");
+
+    // 게임 객체 생성
+    PizzaGame game;
+
+    // 게임 루프
+    while (window.isOpen()) {
+        game.handleInput(window);
+        game.updateGame();
+        game.renderGame(window);
+    }
+
     return 0;
 }
