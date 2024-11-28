@@ -1,10 +1,9 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <iostream>
-#include "game.h"
 
-void startGame();
-void showDescription();
+void startGame(); // game.cpp에서 구현
+void showDescription(); // description.cpp에서 구현
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), L"노벨피자상");
@@ -65,7 +64,7 @@ int main() {
             }
         }
 
-        window.clear(sf::Color(255, 241, 184));
+        window.clear(sf::Color(255, 241, 184)); // 배경색
         window.draw(title);
         window.draw(startButtonBox);
         window.draw(startButtonText);

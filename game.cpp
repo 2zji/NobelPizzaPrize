@@ -3,6 +3,7 @@
 #include <SFML/System.hpp>
 #include <iostream>
 #include <cstdlib>
+#include "end.h"
 #include <ctime>
 
 const int WINDOW_WIDTH = 800;
@@ -95,10 +96,10 @@ public:
         if (remainingTime <= 0) {
             gameEnded = true;
             if (totalMoney >= 10000) {
-                std::cout << "You win!" << std::endl; // Show end1.cpp screen
+                showEnd1(); // 게임 성공 화면 호출
             }
             else {
-                std::cout << "You lose!" << std::endl; // Show end2.cpp screen
+                showEnd2(); // 게임 실패 화면 호출
             }
         }
 
@@ -109,15 +110,16 @@ public:
         moneyText.setString("Money: " + std::to_string(totalMoney));
     }
 
+
     void renderGame(sf::RenderWindow& window) {
         window.clear();
 
         // 재료 그리기
-        dough->draw(window);
-        tomato->draw(window);
-        cheese->draw(window);
-        pepperoni->draw(window);
-        potato->draw(window);
+        dough->setPosition(50, 400);
+        tomato->setPosition(150, 400);
+        cheese->setPosition(250, 400);
+        pepperoni->setPosition(350, 400);
+        potato->setPosition(450, 400);
 
         // 텍스트 그리기
         window.draw(moneyText);

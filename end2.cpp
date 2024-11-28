@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include "end.h"
 
 void showEnd2() {
     sf::RenderWindow window(sf::VideoMode(800, 600), L"게임 실패");
