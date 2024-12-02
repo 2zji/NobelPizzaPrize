@@ -310,17 +310,21 @@ void startGame() {
 
 // 게임 설명 화면 표시
 void showDescription(sf::RenderWindow& window) {
-    sf::Text descriptionText;
-    sf::Font font;
-    if (!font.loadFromFile("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\BagelFatOne-Regular.ttf")) {
-        std::cerr << "Error loading font!" << std::endl;
+    sf::Texture descriptionTexture;
+    sf::Sprite descriptionSprite;
+
+    // 이미지 로드
+    if (!descriptionTexture.loadFromFile("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\game.png")) {
+        std::cerr << "Error loading game.png!" << std::endl;
         return;
     }
-    descriptionText.setFont(font);
-    descriptionText.setString(L"피자 만들기 게임에 오신 것을 환영합니다!\n1. 각 재료를 선택하고 피자를 만들어 제출하세요.\n2. 주어진 시간 내에 목표 금액을 달성하세요.");
-    descriptionText.setCharacterSize(24);
-    descriptionText.setFillColor(sf::Color::Black);
-    descriptionText.setPosition(100, 100);
+
+    // 화면 크기에 맞게 조정
+    descriptionSprite.setTexture(descriptionTexture);
+    sf::Vector2u textureSize = descriptionTexture.getSize();
+    float scaleX = static_cast<float>(WINDOW_WIDTH) / textureSize.x;
+    float scaleY = static_cast<float>(WINDOW_HEIGHT) / textureSize.y;
+    descriptionSprite.setScale(scaleX, scaleY);
 
     while (window.isOpen()) {
         sf::Event event;
@@ -328,10 +332,51 @@ void showDescription(sf::RenderWindow& window) {
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
+
+            // 키 입력 또는 마우스 클릭 시 설명 화면 종료
+            if (event.type == sf::Event::KeyPressed || event.type == sf::Event::MouseButtonPressed) {
+                return;
+            }
         }
 
-        window.clear(sf::Color(255, 241, 184));
-        window.draw(descriptionText);
+        window.clear();
+        window.draw(descriptionSprite); // 이미지 그리기
+        window.display();
+    }
+}
+
+void showMainScreen(sf::RenderWindow& window) {
+    sf::Texture mainTexture;
+    sf::Sprite mainSprite;
+
+    // main.png 로드
+    if (!mainTexture.loadFromFile("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\main.png")) {
+        std::cerr << "Error loading main.png!" << std::endl;
+        return;
+    }
+
+    mainSprite.setTexture(mainTexture);
+
+    // 화면 크기에 맞게 이미지 크기 조정
+    float scaleX = static_cast<float>(WINDOW_WIDTH) / mainSprite.getGlobalBounds().width;
+    float scaleY = static_cast<float>(WINDOW_HEIGHT) / mainSprite.getGlobalBounds().height;
+    mainSprite.setScale(scaleX, scaleY);
+
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
+
+            // 키 입력 또는 마우스 클릭 시 메인 화면 종료
+            if (event.type == sf::Event::KeyPressed || event.type == sf::Event::MouseButtonPressed) {
+                return;
+            }
+        }
+
+        window.clear();
+        window.draw(mainSprite); // 메인 이미지를 그리기
         window.display();
     }
 }
@@ -339,10 +384,13 @@ void showDescription(sf::RenderWindow& window) {
 int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Pizza Making Game");
 
-    // 게임 설명을 먼저 보여주기
+    // 메인 화면을 먼저 보여주기
+    showMainScreen(window);
+
+    // 게임 설명 화면 표시
     showDescription(window);
 
-    // 그 후 게임 시작
+    // 게임 시작
     startGame();
 
     return 0;
