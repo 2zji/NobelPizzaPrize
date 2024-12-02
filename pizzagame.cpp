@@ -11,15 +11,17 @@ const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 const int GAME_TIME = 60;
 
-// 게임 클래스
+// Ingredient 클래스 (피자 재료를 표현하며, 각 재료의 텍스처, 스프라이트, 이름, 가격 관리)
 class Ingredient {
 public:
-    sf::Texture texture;
-    sf::Sprite sprite;
-    std::string name;
-    int price;
+    sf::Texture texture;    // 재료 이미지 저장
+    sf::Sprite sprite;      // 텍스처 기반 스프라이트
+    std::string name;       // 재료 이름
+    int price;              // 재료 가격
 
+    // 재료 클래스 생성자: 텍스처 로드, 스프라이트 설정, 이름 및 가격 초기화
     Ingredient(const std::string& textureFile, const std::string& ingredientName, int ingredientPrice) {
+            // textureFile: 텍스처 파일 경로, ingredientName: 재료 이름, ingredientPrice: 재료 가격
         if (!texture.loadFromFile(textureFile)) {
             std::cerr << "Error loading texture: " << textureFile << std::endl;
         }
@@ -28,49 +30,52 @@ public:
         price = ingredientPrice;
     }
 
+    // 재료의 위치 설정
     void setPosition(float x, float y) {
         sprite.setPosition(x, y);
     }
 
+    // 재료를 화면에 렌더링
     void draw(sf::RenderWindow& window) {
         window.draw(sprite);
     }
 };
 
-// 게임 클래스
+// PizzaGame 클래스 (게임 로직, 화면 렌더링, 입력 처리 등 게임 전반적인 관리 담당)
 class PizzaGame {
 private:
-    int totalMoney;
-    int elapsedTime;
-    bool gameEnded;
-    sf::Font font;
-    sf::Text moneyText, timerText;
-    sf::Clock clock;
+    int totalMoney;     // 플레이어가 번 총 금액
+    int elapsedTime;    // 경과 시간
+    bool gameEnded;     // 게임 종료
+    sf::Font font;      // 텍스트 표시 폰트
+    sf::Text moneyText, timerText;  // 인게임 금액, 시간 텍스트
+    sf::Clock clock;    // 시계
 
+    // 피자 재료 객체
     Ingredient* dough;
     Ingredient* tomato;
     Ingredient* cheese;
     Ingredient* pepperoni;
     Ingredient* potato;
 
-    sf::Texture selectedTexture;
-    sf::Sprite selectedSprite;
-    bool ingredientSelected;
-    bool hasPepperoniOrPotato;
+    sf::Texture selectedTexture;    // 선택 재료 텍스처
+    sf::Sprite selectedSprite;      // 선택 재료 스프라이트
+    bool ingredientSelected;        // 재료 선택 여부
+    bool hasPepperoniOrPotato;      // 현재 피자에 페퍼로니 or 포테이토가 있는지 여부
 
-    // 제출 버튼
-    sf::RectangleShape submitButton;
-    sf::Text submitButtonText;
+    sf::RectangleShape submitButton;    // 제출 버튼
+    sf::Text submitButtonText;          // 제출 버튼 텍스트
 
     // 랜덤 목표 피자 관련
-    std::string targetPizza;
-    sf::Text targetPizzaText;
+    std::string targetPizza;    // 목표 피자 종류
+    sf::Text targetPizzaText;   // 목표 피자 텍스트
 
     // 추가된 멤버 변수
     sf::Texture endTexture;   // 종료 화면 텍스처
     sf::Sprite endSprite;     // 종료 화면 스프라이트
 
 public:
+    //게임 생성자: 변수 초기화 및 폰트, 재료, 버튼 설정 
     PizzaGame() : ingredientSelected(false), hasPepperoniOrPotato(false) {
         totalMoney = 0;
         elapsedTime = 0;
@@ -137,6 +142,7 @@ public:
         delete potato;
     }
 
+    // 목표 피자를 랜덤으로 생성
     void generateRandomPizza() {
         if (std::rand() % 2 == 0) {
             targetPizza = "Potato";
@@ -148,6 +154,7 @@ public:
         }
     }
 
+    // 게임 상태 업데이트: 시간 확인, 종료 상태 확인, 텍스트 갱신
     void updateGame() {
         if (gameEnded) return;
 
@@ -172,12 +179,12 @@ public:
         moneyText.setString("Money: " + std::to_string(totalMoney));
     }
 
-
+    // 게임 렌더링: 재료, 버튼, 텍스트, 목표 피자 표시
     void renderGame(sf::RenderWindow& window) {
         window.clear(sf::Color(255, 241, 184)); // 배경 색 변경
 
         if (gameEnded) {
-            window.draw(endSprite);  // 게임이 끝나면 엔딩 화면을 그린다.
+            window.draw(endSprite);  // 게임이 끝나면 엔딩 화면
         }
         else {
             // 재료 그리기
@@ -207,6 +214,7 @@ public:
         window.display();
     }
 
+    // 입력 처리: 마우스 클릭으로 재료 선택 및 제출 처리
     void handleInput(sf::RenderWindow& window) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -245,7 +253,7 @@ public:
         }
     }
 
-    // 선택된 이미지 로드 및 표시
+    // 선택된 이미지를 로드하여 화면에 표시
     void loadSelectedImage(const std::string& filePath) {
         if (selectedTexture.loadFromFile(filePath)) {
             selectedSprite.setTexture(selectedTexture);
@@ -253,7 +261,7 @@ public:
         }
     }
 
-    // 제출 버튼 처리
+    // 피자 제출 처리: 목표 피자와 일치하면 금액 추가, 새 목표 설정
     void submitPizza() {
         if (ingredientSelected) {
             if ((targetPizza == "Potato" && hasPepperoniOrPotato) || (targetPizza == "Pepperoni" && hasPepperoniOrPotato)) {
@@ -265,6 +273,7 @@ public:
         }
     }
 
+    // 승리 화면 표시
     void showEnd1() {
         if (!endTexture.loadFromFile("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\end1.png")) {
             std::cerr << "Error!" << std::endl;
@@ -279,6 +288,7 @@ public:
         gameEnded = true;  // 게임 종료 상태로 변경
     }
 
+    // 패배 화면 표시
     void showEnd2() {
         if (!endTexture.loadFromFile("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\end2.png")) {
             std::cerr << "Error!" << std::endl;
@@ -295,7 +305,7 @@ public:
 
 };
 
-// 게임 실행 함수
+// 게임 실행 함수: 입력 처리, 업데이트, 렌더링 반복
 void startGame() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "NobelPizzaPrize");
 
@@ -308,7 +318,7 @@ void startGame() {
     }
 }
 
-// 게임 설명 화면 표시
+// 게임 설명 화면 표시 함수
 void showDescription(sf::RenderWindow& window) {
     sf::Texture descriptionTexture;
     sf::Sprite descriptionSprite;
@@ -345,11 +355,12 @@ void showDescription(sf::RenderWindow& window) {
     }
 }
 
+// 메인 화면 표시 함수
 void showMainScreen(sf::RenderWindow& window) {
     sf::Texture mainTexture;
     sf::Sprite mainSprite;
 
-    // main.png 로드
+    // main.png
     if (!mainTexture.loadFromFile("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\main.png")) {
         std::cerr << "Error loading main.png!" << std::endl;
         return;
@@ -376,15 +387,16 @@ void showMainScreen(sf::RenderWindow& window) {
         }
 
         window.clear();
-        window.draw(mainSprite); // 메인 이미지를 그리기
+        window.draw(mainSprite); // 메인 이미지 그리기
         window.display();
     }
 }
 
+// main 함수: 메인 화면 -> 설명 화면 -> 게임 실행 순으로 진행
 int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Pizza Making Game");
 
-    // 메인 화면을 먼저 보여주기
+    // 메인 화면 먼저 보여주기
     showMainScreen(window);
 
     // 게임 설명 화면 표시
