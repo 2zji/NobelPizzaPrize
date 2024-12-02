@@ -3,8 +3,8 @@
 #include <SFML/System.hpp>
 #include <iostream>
 #include <string>
-#include <cstdlib>  // for std::rand, std::srand
-#include <ctime>    // for std::time
+#include <cstdlib>
+#include <ctime>
 
 // 상수 정의
 const int WINDOW_WIDTH = 800;
