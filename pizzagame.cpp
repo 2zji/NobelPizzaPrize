@@ -163,7 +163,7 @@ public:
 
         if (remainingTime <= 0) {
             gameEnded = true;
-            if (totalMoney >= 100000) {
+            if (totalMoney >= 50000) {
                 showEnd1(); // 승리 화면 표시
             }
             else {
@@ -228,20 +228,20 @@ public:
 
                 // 재료 버튼 클릭 처리
                 if (dough->sprite.getGlobalBounds().contains(mousePosF)) {
-                    loadSelectedImage("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\dou_img.png");
+                    loadSelectedImage("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\dou_img.png", 180);
                 }
                 else if (tomato->sprite.getGlobalBounds().contains(mousePosF)) {
-                    loadSelectedImage("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\tomato_img.png");
+                    loadSelectedImage("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\tomato_img.png", 180);
                 }
                 else if (cheese->sprite.getGlobalBounds().contains(mousePosF)) {
-                    loadSelectedImage("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\cheese_img.png");
+                    loadSelectedImage("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\cheese_img.png", 180);
                 }
                 else if (pepperoni->sprite.getGlobalBounds().contains(mousePosF)) {
-                    loadSelectedImage("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\pepperoni_img.png");
+                    loadSelectedImage("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\pepperoni_img.png", 180);
                     hasPepperoniOrPotato = true;
                 }
                 else if (potato->sprite.getGlobalBounds().contains(mousePosF)) {
-                    loadSelectedImage("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\potato_img.png");
+                    loadSelectedImage("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\potato_img.png", 180);
                     hasPepperoniOrPotato = true;
                 }
 
@@ -254,12 +254,19 @@ public:
     }
 
     // 선택된 이미지를 로드하여 화면에 표시
-    void loadSelectedImage(const std::string& filePath) {
+    void loadSelectedImage(const std::string& filePath, float yPos) {
         if (selectedTexture.loadFromFile(filePath)) {
             selectedSprite.setTexture(selectedTexture);
+
+            // 사용자 지정 yPos를 사용
+            float xPos = WINDOW_WIDTH - selectedSprite.getGlobalBounds().width - 20; // 우측 여백 20
+            selectedSprite.setPosition(xPos, yPos);
+
             ingredientSelected = true;
         }
     }
+
+
 
     // 피자 제출 처리: 목표 피자와 일치하면 금액 추가, 새 목표 설정
     void submitPizza() {
@@ -325,7 +332,7 @@ void showDescription(sf::RenderWindow& window) {
 
     // 이미지 로드
     if (!descriptionTexture.loadFromFile("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\game.png")) {
-        std::cerr << "Error loading game.png!" << std::endl;
+        std::cerr << "Error!" << std::endl;
         return;
     }
 
@@ -362,7 +369,7 @@ void showMainScreen(sf::RenderWindow& window) {
 
     // main.png
     if (!mainTexture.loadFromFile("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\main.png")) {
-        std::cerr << "Error loading main.png!" << std::endl;
+        std::cerr << "Error!" << std::endl;
         return;
     }
 
