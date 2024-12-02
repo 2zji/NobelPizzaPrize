@@ -53,20 +53,22 @@ private:
     Ingredient* pepperoni;
     Ingredient* potato;
 
-    // 선택된 재료 이미지를 저장할 스프라이트
     sf::Texture selectedTexture;
     sf::Sprite selectedSprite;
-    bool ingredientSelected; // 재료가 선택되었는지 여부
-
-    bool hasPepperoniOrPotato; // 피자에 페퍼로니나 포테이토가 들어갔는지 확인
+    bool ingredientSelected;
+    bool hasPepperoniOrPotato;
 
     // 제출 버튼
     sf::RectangleShape submitButton;
     sf::Text submitButtonText;
 
     // 랜덤 목표 피자 관련
-    std::string targetPizza; // 목표 피자 (pepperoni 또는 potato)
+    std::string targetPizza;
     sf::Text targetPizzaText;
+
+    // 추가된 멤버 변수
+    sf::Texture endTexture;   // 종료 화면 텍스처
+    sf::Sprite endSprite;     // 종료 화면 스프라이트
 
 public:
     PizzaGame() : ingredientSelected(false), hasPepperoniOrPotato(false) {
@@ -154,7 +156,7 @@ public:
 
         if (remainingTime <= 0) {
             gameEnded = true;
-            if (totalMoney >= 10000) {
+            if (totalMoney >= 100000) {
                 showEnd1(); // 승리 화면 표시
             }
             else {
@@ -170,31 +172,37 @@ public:
         moneyText.setString("Money: " + std::to_string(totalMoney));
     }
 
+
     void renderGame(sf::RenderWindow& window) {
         window.clear(sf::Color(255, 241, 184)); // 배경 색 변경
 
-        // 재료 그리기
-        dough->draw(window);
-        tomato->draw(window);
-        cheese->draw(window);
-        pepperoni->draw(window);
-        potato->draw(window);
-
-        // 선택된 이미지가 있으면 그리기
-        if (ingredientSelected) {
-            window.draw(selectedSprite);
+        if (gameEnded) {
+            window.draw(endSprite);  // 게임이 끝나면 엔딩 화면을 그린다.
         }
+        else {
+            // 재료 그리기
+            dough->draw(window);
+            tomato->draw(window);
+            cheese->draw(window);
+            pepperoni->draw(window);
+            potato->draw(window);
 
-        // 제출 버튼 그리기
-        window.draw(submitButton);
-        window.draw(submitButtonText);
+            // 선택된 이미지가 있으면 그리기
+            if (ingredientSelected) {
+                window.draw(selectedSprite);
+            }
 
-        // 텍스트 그리기
-        window.draw(moneyText);
-        window.draw(timerText);
+            // 제출 버튼 그리기
+            window.draw(submitButton);
+            window.draw(submitButtonText);
 
-        // 목표 피자 텍스트 그리기
-        window.draw(targetPizzaText);
+            // 텍스트 그리기
+            window.draw(moneyText);
+            window.draw(timerText);
+
+            // 목표 피자 텍스트 그리기
+            window.draw(targetPizzaText);
+        }
 
         window.display();
     }
@@ -258,17 +266,38 @@ public:
     }
 
     void showEnd1() {
-        std::cout << "You Win!" << std::endl;
+        if (!endTexture.loadFromFile("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\end1.png")) {
+            std::cerr << "Error!" << std::endl;
+        }
+        endSprite.setTexture(endTexture);
+
+        // 화면 크기에 맞게 엔딩 이미지를 크기 조정
+        float scaleX = static_cast<float>(WINDOW_WIDTH) / endSprite.getGlobalBounds().width;
+        float scaleY = static_cast<float>(WINDOW_HEIGHT) / endSprite.getGlobalBounds().height;
+        endSprite.setScale(scaleX, scaleY);
+
+        gameEnded = true;  // 게임 종료 상태로 변경
     }
 
     void showEnd2() {
-        std::cout << "You Lose!" << std::endl;
+        if (!endTexture.loadFromFile("C:\\연습\\노벨피자상\\NobelPizzaPrize\\assents\\end2.png")) {
+            std::cerr << "Error!" << std::endl;
+        }
+        endSprite.setTexture(endTexture);
+
+        // 화면 크기에 맞게 엔딩 이미지를 크기 조정
+        float scaleX = static_cast<float>(WINDOW_WIDTH) / endSprite.getGlobalBounds().width;
+        float scaleY = static_cast<float>(WINDOW_HEIGHT) / endSprite.getGlobalBounds().height;
+        endSprite.setScale(scaleX, scaleY);
+
+        gameEnded = true;  // 게임 종료 상태로 변경
     }
+
 };
 
 // 게임 실행 함수
 void startGame() {
-    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Pizza Making Game");
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "NobelPizzaPrize");
 
     PizzaGame game;
 
